@@ -1,0 +1,77 @@
+name: Terraform Plan Template
+
+on:
+  # This workflow is intended for reuse via workflow_call by LZ owners.
+  workflow_call:
+    inputs:
+      tfDirectory:
+        description: 'Path to the Terraform configuration directory (e.g., "." for repository root).'
+        required: false
+        type: string
+        default: "."
+      tfStateKey:
+        description: 'Terraform state file name to use in backend configuration.'
+        required: false
+        type: string
+        default: "terraform.tfstate"
+      jobEnvironment:
+        description: 'GitHub Actions job environment name.'
+        required: false
+        type: string
+        default: "Production-plan"
+      AZURE_STORAGE_ACCOUNT_NAME:
+        description: 'Storage Account name that hosts the tfstate container.'
+        required: true
+        type: string
+      AZURE_RESOURCE_GROUP:
+        description: 'Resource Group name for the Storage Account.'
+        required: true
+        default: "rg-tfstate"
+        type: string
+
+env:
+  TF_IN_AUTOMATION: true
+  ARM_USE_OIDC: true
+  ARM_USE_AZUREAD: true
+  ARM_TENANT_ID: 'e4bf623e-28de-42f5-9189-022f8c7f6830'
+
+jobs:
+  terraform:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.jobEnvironment }}
+    env:
+      ARM_CLIENT_ID: ${{ vars.CLIENTID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTIONID }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform CLI
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Initialize Terraform
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform init \
+            -backend-config="storage_account_name=${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=tf-state" \
+            -backend-config="resource_group_name=${{ inputs.AZURE_RESOURCE_GROUP }}" \
+            -backend-config="key=${{ inputs.tfStateKey }}"
+
+      - name: Terraform Plan
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform plan -out="build.tfplan"
+      
+      - name: Terraform show plan
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform show build.tfplan
+      
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: ${{ inputs.tfDirectory }}/build.tfplan
