@@ -22,6 +22,12 @@ on:
         required: false
         type: string
         default: "Production-deploy"
+      tfPlanFile:
+        description: 'Terraform plan file name generated during the plan stage.'
+        required: false
+        type: string
+        default: "build.tfplan"
+
     secrets:
       AZURE_STORAGE_ACCOUNT_NAME:
         description: 'Storage Account name that hosts the tfstate container.'
@@ -70,4 +76,4 @@ jobs:
       - name: Terraform Apply
         run: |
             cd ${{ inputs.tfDirectory }}
-            terraform apply -auto-approve tfplan
+            terraform apply -auto-approve ${{ inputs.tfPlanFile }}

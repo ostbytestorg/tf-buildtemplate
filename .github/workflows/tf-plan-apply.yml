@@ -1,0 +1,64 @@
+# File: .github/workflows/terraform-orchestrator.yml
+#
+# This workflow ties together the Terraform plan and apply stages by calling two reusable workflows:
+#  - terraform-mvp.yml (Plan)
+#  - tf-apply.yml (Apply)
+#
+# It accepts all the parameters used by the plan stage and passes them to both stages.
+#
+name: Terraform Orchestrator
+
+on:
+  workflow_call:
+    inputs:
+      tfDirectory:
+        description: 'Path to the Terraform configuration directory (e.g., "." for repository root).'
+        required: false
+        type: string
+        default: "."
+      tfStateKey:
+        description: 'Terraform state file name to use in backend configuration.'
+        required: false
+        type: string
+        default: "terraform.tfstate"
+      jobEnvironment:
+        description: 'GitHub Actions job environment name.'
+        required: false
+        type: string
+        default: "Production-plan"
+      tfPlanFile:
+        description: 'Terraform plan file name generated during the plan stage.'
+        required: false
+        type: string
+        default: "build.tfplan"
+    secrets:
+      AZURE_STORAGE_ACCOUNT_NAME:
+        description: 'Storage Account name that hosts the tfstate container.'
+        required: true
+      AZURE_RESOURCE_GROUP:
+        description: 'Resource Group name for the Storage Account.'
+        required: true
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    uses: ./.github/workflows/tf-plan.yml
+    with:
+      tfDirectory: ${{ inputs.tfDirectory }}
+      tfStateKey: ${{ inputs.tfStateKey }}
+      jobEnvironment: ${{ inputs.jobEnvironment }}
+    secrets:
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+
+  terraform-apply:
+    name: Terraform Apply
+    needs: terraform-plan
+    uses: ./.github/workflows/tf-apply.yml
+    with:
+      tfDirectory: ${{ inputs.tfDirectory }}
+      tfPlanFile: ${{ inputs.tfPlanFile }}
+      tfStateKey: ${{ inputs.tfStateKey }}
+    secrets:
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
