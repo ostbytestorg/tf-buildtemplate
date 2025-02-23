@@ -63,8 +63,7 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          cd ${{ inputs.tfDirectory }}
-          terraform plan -out=build.tfplan
+          terraform plan -out="build.tfplan"
       
       - name: Terraform show plan
         run: terraform show build.tfplan
