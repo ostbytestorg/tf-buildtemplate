@@ -31,13 +31,15 @@ on:
         required: false
         type: string
         default: "build.tfplan"
-    secrets:
       AZURE_STORAGE_ACCOUNT_NAME:
         description: 'Storage Account name that hosts the tfstate container.'
         required: true
+        type: string
       AZURE_RESOURCE_GROUP:
         description: 'Resource Group name for the Storage Account.'
         required: true
+        default: "rg-tfstate"
+        type: string
 
 jobs:
   terraform-plan:
@@ -47,9 +49,8 @@ jobs:
       tfDirectory: ${{ inputs.tfDirectory }}
       tfStateKey: ${{ inputs.tfStateKey }}
       jobEnvironment: ${{ inputs.jobEnvironment }}
-    secrets:
-      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}
 
   terraform-apply:
     name: Terraform Apply
@@ -59,6 +60,5 @@ jobs:
       tfDirectory: ${{ inputs.tfDirectory }}
       tfPlanFile: ${{ inputs.tfPlanFile }}
       tfStateKey: ${{ inputs.tfStateKey }}
-    secrets:
-      AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}

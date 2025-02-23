@@ -24,14 +24,15 @@ on:
         required: false
         type: string
         default: "build.tfplan"
-
-    secrets:
       AZURE_STORAGE_ACCOUNT_NAME:
         description: 'Storage Account name that hosts the tfstate container.'
         required: true
+        type: string
       AZURE_RESOURCE_GROUP:
         description: 'Resource Group name for the Storage Account.'
         required: true
+        default: "rg-tfstate"
+        type: string
 
 env:
   TF_IN_AUTOMATION: true
@@ -59,9 +60,9 @@ jobs:
         run: |
           cd ${{ inputs.tfDirectory }}
           terraform init \
-            -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="storage_account_name=${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=tf-state" \
-            -backend-config="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            -backend-config="resource_group_name=${{ inputs.AZURE_RESOURCE_GROUP }}" \
             -backend-config="key=${{ inputs.tfStateKey }}"
 
       - name: Download Terraform Plan Artifact
