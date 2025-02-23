@@ -48,6 +48,9 @@ jobs:
   terraform:
     name: Terraform Build & Execution
     runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ vars.CLIENTID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTIONID }}
 
     steps:
       - name: Checkout Repository
