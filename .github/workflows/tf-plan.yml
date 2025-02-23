@@ -63,10 +63,13 @@ jobs:
 
       - name: Terraform Plan
         run: |
+          cd ${{ inputs.tfDirectory }}
           terraform plan -out="build.tfplan"
       
       - name: Terraform show plan
-        run: terraform show build.tfplan
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform show build.tfplan
       
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
