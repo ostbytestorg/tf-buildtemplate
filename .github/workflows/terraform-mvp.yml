@@ -38,6 +38,12 @@ on:
         description: 'Resource Group name for the Storage Account.'
         required: true
 
+env:
+  TF_IN_AUTOMATION: true
+  ARM_USE_OIDC: true
+  ARM_USE_AZUREAD: true
+  ARM_TENANT_ID: 'e4bf623e-28de-42f5-9189-022f8c7f6830'
+
 jobs:
   terraform:
     name: Terraform Build & Execution
