@@ -1,7 +1,4 @@
-# File: .github/workflows/terraform-mvp.yml
-# Version: v1.1
-
-name: Terraform Build Template
+name: Terraform Apply Template
 
 on:
   # This workflow is intended for reuse via workflow_call by LZ owners.
@@ -44,7 +41,7 @@ env:
 
 jobs:
   terraform:
-    name: Terraform Build & Execution
+    name: Terraform Apply
     runs-on: ubuntu-latest
     environment: ${{ inputs.jobEnvironment }}
     env:

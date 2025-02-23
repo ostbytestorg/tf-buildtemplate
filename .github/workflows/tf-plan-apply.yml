@@ -1,7 +1,7 @@
 # File: .github/workflows/terraform-orchestrator.yml
 #
 # This workflow ties together the Terraform plan and apply stages by calling two reusable workflows:
-#  - terraform-mvp.yml (Plan)
+#  - tf-apply.yml (Plan)
 #  - tf-apply.yml (Apply)
 #
 # It accepts all the parameters used by the plan stage and passes them to both stages.
