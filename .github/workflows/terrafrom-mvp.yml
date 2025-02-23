@@ -1,0 +1,72 @@
+# File: .github/workflows/terraform-mvp.yml
+# Version: v1.1
+#
+# This reusable workflow template provides a generic mechanism for executing Terraform
+# plans or applies against an Enterprise Scale Landing Zone in Azure.
+#
+# Pre-requisites handled outside this template:
+# - Landing zone deployed with a storage account containing a "tf-state" container.
+# - Caller workflow has performed Azure login/sign-in.
+# - The service principal used by the caller has the necessary permissions.
+#
+# This template uses:
+# - Terraform CLI (via hashicorp/setup-terraform).
+# - The backend configured to use the provided Azure Storage Account and tf-state container.
+#
+
+name: Terraform Build Template
+
+on:
+  # This workflow is intended for reuse via workflow_call by LZ owners.
+  workflow_call:
+    inputs:
+      tfDirectory:
+        description: 'Path to the Terraform configuration directory (e.g., "." for repository root).'
+        required: false
+        type: string
+        default: "."
+      action:
+        description: 'Terraform action to perform: "plan" or "apply".'
+        required: false
+        type: string
+        default: "plan"
+    secrets:
+      AZURE_STORAGE_ACCOUNT_NAME:
+        description: 'Storage Account name that hosts the tfstate container.'
+        required: true
+      AZURE_RESOURCE_GROUP:
+        description: 'Resource Group name for the Storage Account.'
+        required: true
+
+jobs:
+  terraform:
+    name: Terraform Build & Execution
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform CLI
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Initialize Terraform
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform init \
+            -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=tf-state" \
+            -backend-config="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            -backend-config="key=terraform.tfstate"
+
+      - name: Terraform Plan
+        if: ${{ inputs.action == 'plan' }}
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform plan
+
+      - name: Terraform Apply
+        if: ${{ inputs.action == 'apply' }}
+        run: |
+          cd ${{ inputs.tfDirectory }}
+          terraform apply -auto-approve
