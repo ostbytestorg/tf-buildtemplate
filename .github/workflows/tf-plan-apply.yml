@@ -33,12 +33,11 @@ on:
         default: "build.tfplan"
       AZURE_STORAGE_ACCOUNT_NAME:
         description: 'Storage Account name that hosts the tfstate container.'
-        required: true
+        required: false
         type: string
       AZURE_RESOURCE_GROUP:
         description: 'Resource Group name for the Storage Account.'
-        required: true
-        default: "rg-tfstate"
+        required: false
         type: string
 
 jobs:
@@ -49,8 +48,8 @@ jobs:
       tfDirectory: ${{ inputs.tfDirectory }}
       tfStateKey: ${{ inputs.tfStateKey }}
       jobEnvironment: ${{ inputs.jobEnvironment }}
-      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}
-      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME || vars.TFSTATESTORAGEACCOUNTNAME }}
+      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP || vars.TFSTATERGNAME }}
 
   terraform-apply:
     name: Terraform Apply
