@@ -44,7 +44,6 @@ on:
 jobs:
   terraform-plan:
     name: Terraform Plan
-    if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
     uses: ./.github/workflows/tf-plan.yml
     with:
       tfDirectory: ${{ inputs.tfDirectory }}
