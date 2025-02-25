@@ -49,6 +49,8 @@ jobs:
       tfDirectory: ${{ inputs.tfDirectory }}
       tfStateKey: ${{ inputs.tfStateKey }}
       jobEnvironment: ${{ inputs.jobEnvironment }}
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}
 
   terraform-apply:
     name: Terraform Apply
