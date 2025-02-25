@@ -40,6 +40,7 @@ on:
         required: false
         type: string
 
+ 
 jobs:
   terraform-plan:
     name: Terraform Plan
@@ -48,8 +49,6 @@ jobs:
       tfDirectory: ${{ inputs.tfDirectory }}
       tfStateKey: ${{ inputs.tfStateKey }}
       jobEnvironment: ${{ inputs.jobEnvironment }}
-      AZURE_STORAGE_ACCOUNT_NAME: ${{ inputs.AZURE_STORAGE_ACCOUNT_NAME || vars.TFSTATESTORAGEACCOUNTNAME }}
-      AZURE_RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP || vars.TFSTATERGNAME }}
 
   terraform-apply:
     name: Terraform Apply
