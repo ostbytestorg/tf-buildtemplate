@@ -66,6 +66,8 @@ jobs:
           terraform plan -out="build.tfplan"
       
       - name: Terraform show plan
+        env:
+          TF_VAR_last_pipe_run: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           cd ${{ inputs.tfDirectory }}
           terraform show build.tfplan
