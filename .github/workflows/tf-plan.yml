@@ -61,6 +61,8 @@ jobs:
             -backend-config="key=${{ inputs.tfStateKey }}"
 
       - name: Terraform Plan
+        env:
+          TF_VAR_last_pipe_run: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           cd ${{ inputs.tfDirectory }}
           terraform plan -out="build.tfplan"
