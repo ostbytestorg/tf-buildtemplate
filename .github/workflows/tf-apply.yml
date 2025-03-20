@@ -42,8 +42,7 @@ env:
 jobs:
   terraform:
     name: Terraform Apply
-    runs-on:
-      group: vnet-spoke-production-engineers
+    runs-on: ubuntu-latest
     environment: ${{ inputs.jobEnvironment }}
     env:
       ARM_CLIENT_ID: ${{ vars.CLIENTID }}
